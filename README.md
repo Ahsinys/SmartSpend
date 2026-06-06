@@ -4,13 +4,11 @@
 Name: Ahsin Younas
 Roll Number: L1F23BSSE0225
 
----
 
 ## Project Description
 SmartSpend is a Java-based Personal Finance and Budget Tracking application.  
 It helps users manage income, expenses, budgets, and view financial reports using MySQL database integration.
 
----
 
 ## Features (Planned)
 - User Registration and Login
@@ -20,7 +18,6 @@ It helps users manage income, expenses, budgets, and view financial reports usin
 - Search and Filtering System
 - Dashboard Summary
 
----
 
 ## Technologies Used
 - Java (JDK 17+ / 21 / 24)
@@ -28,7 +25,6 @@ It helps users manage income, expenses, budgets, and view financial reports usin
 - MySQL Database
 - IntelliJ IDEA
 
----
 
 ## Database
 Database Name: smartspend_db
@@ -38,15 +34,13 @@ Tables:
 - transactions
 - budgets
 
----
 
-## 🚀 How to Run
+## How to Run
 1. Create MySQL database `smartspend_db`
 2. Run SQL table scripts
 3. Open project in IntelliJ IDEA
 4. Run `TestConnection.java`
 
----
 
 ## Status
-Day 1 Setup Completed ✔
+Day 1 Setup Completed 
