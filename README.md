@@ -1,8 +1,6 @@
 # SmartSpend
 
-# SMARTSPEND - Personal Finance Tracker
-
-## Student Information
+## Student
 Name: Ahsin Younas
 Roll Number: L1F23BSSE0225
 
