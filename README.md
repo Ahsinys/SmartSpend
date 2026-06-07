@@ -1,11 +1,11 @@
 # SmartSpend
 
-## Student
+**Student**
 Name: Ahsin Younas
 Roll Number: L1F23BSSE0225
 
 
-## Project Description
+**Project Description**
 SmartSpend is a Java desktop application for personal finance and budget tracking.
 
 The application stores all data locally using CSV files:
@@ -14,7 +14,7 @@ The application stores all data locally using CSV files:
 - budgets.csv
 
 
-## Features (Planned)
+**Features (Planned)**
 - User Registration and Login System
 - Add, Edit, Delete Transactions (Income & Expenses)
 - Monthly Budget Management by Category
