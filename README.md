@@ -6,8 +6,12 @@ Roll Number: L1F23BSSE0225
 
 
 ## Project Description
-SmartSpend is a Java-based Personal Finance and Budget Tracking application.  
-It helps users manage income, expenses, budgets, and view financial reports using MySQL database integration.
+SmartSpend is a Java desktop application for personal finance and budget tracking.
+
+The application stores all data locally using CSV files:
+- users.csv
+- transactions.csv
+- budgets.csv
 
 
 ## Features (Planned)
@@ -19,27 +23,13 @@ It helps users manage income, expenses, budgets, and view financial reports usin
 - Dashboard Summary
 
 
-## Technologies Used
-- Java (JDK 17+ / 21 / 24)
-- JDBC (MySQL Connector)
-- MySQL Database
+Technologies Used
+- Java (JDK 17+)
+- Java Swing
+- CSV File I/O
+- BufferedReader / BufferedWriter
 - IntelliJ IDEA
-
-
-## Database
-Database Name: smartspend_db
-
-Tables:
-- users
-- transactions
-- budgets
-
-
-## How to Run
-1. Create MySQL database `smartspend_db`
-2. Run SQL table scripts
-3. Open project in IntelliJ IDEA
-4. Run `TestConnection.java`
+- Git & GitHub
 
 
 ## Status
