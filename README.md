@@ -34,3 +34,4 @@ Technologies Used
 
 ## Status
 Day 1 Setup Completed 
+Day 1 Revised (Project Setup + File System + Model Classes)
