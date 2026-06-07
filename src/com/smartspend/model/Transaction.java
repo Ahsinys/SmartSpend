@@ -1,6 +1,6 @@
 package com.smartspend.model;
 
-import java.sql.Date;
+import java.time.LocalDate;
 
 public class Transaction {
 
@@ -10,13 +10,13 @@ public class Transaction {
     private String category;
     private double amount;
     private String note;
-    private Date date;
+    private LocalDate date;
 
     public Transaction() {
     }
 
-    public Transaction(int id, int userId, String type, String category, double amount, String note, Date date)
-    {
+    public Transaction(int id, int userId, String type, String category,
+                       double amount, String note, LocalDate date) {
         this.id = id;
         this.userId = userId;
         this.type = type;
@@ -74,16 +74,27 @@ public class Transaction {
         this.note = note;
     }
 
-    public Date getDate() {
+    public LocalDate getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(LocalDate date) {
         this.date = date;
     }
 
     @Override
     public String toString() {
         return category + " - " + amount;
+    }
+
+    // CSV conversion method
+    public String toCsvRow() {
+        return id + "," +
+                userId + "," +
+                type + "," +
+                category + "," +
+                amount + "," +
+                note + "," +
+                date;
     }
 }

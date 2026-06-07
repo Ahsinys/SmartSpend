@@ -10,8 +10,7 @@ public class User {
     public User() {
     }
 
-    public User(int id, String username, String password, String email)
-    {
+    public User(int id, String username, String password, String email) {
         this.id = id;
         this.username = username;
         this.password = password;
@@ -53,5 +52,10 @@ public class User {
     @Override
     public String toString() {
         return username;
+    }
+
+    // CSV conversion
+    public String toCsvRow() {
+        return id + "," + username + "," + password + "," + email;
     }
 }

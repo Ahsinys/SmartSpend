@@ -12,8 +12,7 @@ public class Budget {
     public Budget() {
     }
 
-    public Budget(int id, int userId, String category, double limitAmount, int month, int year)
-    {
+    public Budget(int id, int userId, String category, double limitAmount, int month, int year) {
         this.id = id;
         this.userId = userId;
         this.category = category;
@@ -68,5 +67,9 @@ public class Budget {
 
     public void setYear(int year) {
         this.year = year;
+    }
+
+    public String toCsvRow() {
+        return id + "," + userId + "," + category + "," + limitAmount + "," + month + "," + year;
     }
 }
