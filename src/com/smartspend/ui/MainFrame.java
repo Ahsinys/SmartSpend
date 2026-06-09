@@ -1,6 +1,5 @@
 package com.smartspend.ui;
 
-import com.smartspend.model.User;
 import com.smartspend.util.Session;
 
 import javax.swing.*;
@@ -8,24 +7,13 @@ import java.awt.*;
 
 public class MainFrame extends JFrame {
 
-    private User currentUser;
-
     private CardLayout cardLayout;
     private JPanel contentPanel;
 
-    private JButton dashboardBtn;
-    private JButton transactionsBtn;
-    private JButton budgetBtn;
-    private JButton searchBtn;
-    private JButton reportsBtn;
-    private JButton logoutBtn;
-
     public MainFrame() {
 
-        currentUser = Session.currentUser;
-
         setTitle("SmartSpend");
-        setSize(800, 600);
+        setSize(1000, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
@@ -35,12 +23,12 @@ public class MainFrame extends JFrame {
         JPanel navPanel = new JPanel();
         navPanel.setLayout(new GridLayout(6, 1));
 
-        dashboardBtn = new JButton("Dashboard");
-        transactionsBtn = new JButton("Transactions");
-        budgetBtn = new JButton("Budget");
-        searchBtn = new JButton("Search");
-        reportsBtn = new JButton("Reports");
-        logoutBtn = new JButton("Logout");
+        JButton dashboardBtn = new JButton("Dashboard");
+        JButton transactionsBtn = new JButton("Transactions");
+        JButton budgetBtn = new JButton("Budget");
+        JButton searchBtn = new JButton("Search");
+        JButton reportsBtn = new JButton("Reports");
+        JButton logoutBtn = new JButton("Logout");
 
         navPanel.add(dashboardBtn);
         navPanel.add(transactionsBtn);
@@ -51,15 +39,14 @@ public class MainFrame extends JFrame {
 
         add(navPanel, BorderLayout.WEST);
 
-        // CARD LAYOUT PANEL
+        // CARD LAYOUT
         cardLayout = new CardLayout();
         contentPanel = new JPanel(cardLayout);
 
         JPanel dashboardPanel = new JPanel();
         dashboardPanel.add(new JLabel("Dashboard Panel"));
 
-        JPanel transactionPanel = new JPanel();
-        transactionPanel.add(new JLabel("Transaction Panel"));
+        TransactionPanel transactionPanel = new TransactionPanel();
 
         JPanel budgetPanel = new JPanel();
         budgetPanel.add(new JLabel("Budget Panel"));
@@ -67,26 +54,22 @@ public class MainFrame extends JFrame {
         JPanel searchPanel = new JPanel();
         searchPanel.add(new JLabel("Search Panel"));
 
-        JPanel reportPanel = new JPanel();
-        reportPanel.add(new JLabel("Report Panel"));
+        JPanel reportsPanel = new JPanel();
+        reportsPanel.add(new JLabel("Reports Panel"));
 
         contentPanel.add(dashboardPanel, "Dashboard");
         contentPanel.add(transactionPanel, "Transactions");
         contentPanel.add(budgetPanel, "Budget");
         contentPanel.add(searchPanel, "Search");
-        contentPanel.add(reportPanel, "Reports");
+        contentPanel.add(reportsPanel, "Reports");
 
         add(contentPanel, BorderLayout.CENTER);
 
         // BUTTON EVENTS
         dashboardBtn.addActionListener(e -> showPanel("Dashboard"));
-
         transactionsBtn.addActionListener(e -> showPanel("Transactions"));
-
         budgetBtn.addActionListener(e -> showPanel("Budget"));
-
         searchBtn.addActionListener(e -> showPanel("Search"));
-
         reportsBtn.addActionListener(e -> showPanel("Reports"));
 
         logoutBtn.addActionListener(e -> {
@@ -100,7 +83,7 @@ public class MainFrame extends JFrame {
         setVisible(true);
     }
 
-    public void showPanel(String name) {
-        cardLayout.show(contentPanel, name);
+    private void showPanel(String panelName) {
+        cardLayout.show(contentPanel, panelName);
     }
 }
