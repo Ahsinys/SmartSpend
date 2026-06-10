@@ -14,6 +14,7 @@ public class TransactionFileHandler extends BaseFileHandler {
 
     @Override
     public void add(Object obj) {
+
         Transaction t = (Transaction) obj;
 
         List<String[]> data = readAll();
@@ -33,18 +34,23 @@ public class TransactionFileHandler extends BaseFileHandler {
 
     @Override
     public void update(Object obj) {
+
         Transaction t = (Transaction) obj;
 
         List<String[]> data = readAll();
 
         for (String[] row : data) {
+
             if (Integer.parseInt(row[0]) == t.getId()) {
+
                 row[1] = String.valueOf(t.getUserId());
                 row[2] = t.getType();
                 row[3] = t.getCategory();
                 row[4] = String.valueOf(t.getAmount());
                 row[5] = t.getNote();
-                row[6] = t.getDate() != null ? t.getDate().toString() : "";
+                row[6] = t.getDate() != null
+                        ? t.getDate().toString()
+                        : "";
             }
         }
 
@@ -53,10 +59,12 @@ public class TransactionFileHandler extends BaseFileHandler {
 
     @Override
     public void delete(int id) {
+
         List<String[]> data = readAll();
         List<String[]> updated = new ArrayList<>();
 
         for (String[] row : data) {
+
             if (Integer.parseInt(row[0]) != id) {
                 updated.add(row);
             }
@@ -65,9 +73,9 @@ public class TransactionFileHandler extends BaseFileHandler {
         writeAll(updated);
     }
 
-    // =========================
-    // GET ALL TRANSACTIONS USER
-    // =========================
+    // =====================================
+    // GET ALL TRANSACTIONS OF A USER
+    // =====================================
     public List<Transaction> getByUser(int userId) {
 
         List<String[]> data = readAll();
@@ -80,13 +88,25 @@ public class TransactionFileHandler extends BaseFileHandler {
                 Date date;
 
                 try {
-                    if (row.length > 6 && row[6] != null && !row[6].isEmpty()) {
+
+                    if (row.length > 6
+                            && row[6] != null
+                            && !row[6].isEmpty()) {
+
                         date = Date.valueOf(row[6].trim());
+
                     } else {
-                        date = new Date(System.currentTimeMillis());
+
+                        date = new Date(
+                                System.currentTimeMillis()
+                        );
                     }
+
                 } catch (Exception e) {
-                    date = new Date(System.currentTimeMillis());
+
+                    date = new Date(
+                            System.currentTimeMillis()
+                    );
                 }
 
                 Transaction t = new Transaction(
@@ -104,5 +124,40 @@ public class TransactionFileHandler extends BaseFileHandler {
         }
 
         return result;
+    }
+
+    // =====================================
+    // TOTAL SPENT BY CATEGORY
+    // =====================================
+    public double getTotalByCategory(
+            int userId,
+            String category,
+            int month,
+            int year
+    ) {
+
+        double total = 0;
+
+        List<Transaction> transactions =
+                getByUser(userId);
+
+        for (Transaction t : transactions) {
+
+            try {
+
+                if (t.getCategory().equalsIgnoreCase(category)
+                        && t.getType().equalsIgnoreCase("Expense")
+                        && t.getDate().toLocalDate().getMonthValue() == month
+                        && t.getDate().toLocalDate().getYear() == year) {
+
+                    total += t.getAmount();
+                }
+
+            } catch (Exception e) {
+                // Skip bad transaction
+            }
+        }
+
+        return total;
     }
 }
