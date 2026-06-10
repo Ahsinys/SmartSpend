@@ -140,4 +140,29 @@ public class BudgetFileHandler extends BaseFileHandler {
 
         return null;
     }
+    //////////////////////////////////////////////////////////////////////////
+    public List<String[]> getAllRows() {
+        return super.readAll();
+    }
+
+    public List<Budget> getAllBudgets() {
+
+        List<String[]> data = readAll();
+        List<Budget> result = new ArrayList<>();
+
+        for (String[] row : data) {
+            try {
+                result.add(new Budget(
+                        Integer.parseInt(row[0]),
+                        Integer.parseInt(row[1]),
+                        row[2],
+                        Double.parseDouble(row[3]),
+                        Integer.parseInt(row[4]),
+                        Integer.parseInt(row[5])
+                ));
+            } catch (Exception ignored) {}
+        }
+
+        return result;
+    }
 }
