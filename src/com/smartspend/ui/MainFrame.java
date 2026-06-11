@@ -5,6 +5,7 @@ import com.smartspend.util.Session;
 import javax.swing.*;
 import java.awt.*;
 import com.smartspend.ui.SearchPanel;
+import com.smartspend.ui.ReportPanel;
 
 public class MainFrame extends JFrame {
 
@@ -53,8 +54,7 @@ public class MainFrame extends JFrame {
 
         SearchPanel searchPanel = new SearchPanel();
 
-        JPanel reportsPanel = new JPanel();
-        reportsPanel.add(new JLabel("Reports Panel"));
+        ReportPanel reportsPanel = new ReportPanel();
 
         contentPanel.add(dashboardPanel, "Dashboard");
         contentPanel.add(transactionPanel, "Transactions");
