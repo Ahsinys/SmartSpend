@@ -49,7 +49,6 @@ public class MainFrame extends JFrame {
         TransactionPanel transactionPanel = new TransactionPanel();
 
         BudgetPanel budgetPanel = new BudgetPanel();
-        budgetPanel.add(new JLabel("Budget Panel"));
 
         JPanel searchPanel = new JPanel();
         searchPanel.add(new JLabel("Search Panel"));
