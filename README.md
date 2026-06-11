@@ -127,3 +127,49 @@ Data is stored and managed using CSV files with proper service-layer architectur
 - Transaction module fully functional (Add/Delete working)
 - CSV persistence fully integrated
 - Core architecture (Model → FileHandler → Service → UI) established
+
+## DAY 5
+Status
+
+**Day 5 Completed:** Budget Management Module
+
+## Current Progress
+BudgetService created with full calculation logic
+BudgetPanel UI implemented (form + table layout)
+Budget save and update functionality implemented
+Budget linked with transaction data for spent calculation
+Budget status system implemented (OK / WARNING / OVER BUDGET)
+Color coded table added using custom renderer
+
+## Day 5 Summary
+Implemented complete budget management system where users can set category-wise limits and track spending with automatic status updates.
+
+
+<img width="734" height="439" alt="image" src="https://github.com/user-attachments/assets/4eb4cfff-7a79-475f-b446-dd04365b03cb" />
+
+
+---
+
+## DAY 6
+Status
+
+**Day 6 Completed:** Search and Reports Module
+
+## Current Progress
+SearchPanel implemented with multi-filter system
+Transaction search by category, type, date range, and keyword
+Reset and result counter functionality added
+ReportService created for financial calculations
+ReportPanel UI implemented for monthly reports
+Income, expense, and savings calculation added
+Category-wise spending breakdown implemented
+
+## Day 6 Summary
+
+Implemented advanced search and reporting system. Users can now filter transactions and view monthly financial summaries with category-wise analysis.
+
+
+<img width="734" height="438" alt="image" src="https://github.com/user-attachments/assets/bdf0a6a6-13fc-4d7d-8e2d-5d9f247a0802" />
+
+
+<img width="731" height="439" alt="image" src="https://github.com/user-attachments/assets/0884e33c-4568-4c85-8ac2-44aa2d80bbe1" />
