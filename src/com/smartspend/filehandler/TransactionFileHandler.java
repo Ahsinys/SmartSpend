@@ -3,6 +3,7 @@ package com.smartspend.filehandler;
 import com.smartspend.model.Transaction;
 
 import java.sql.Date;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,6 +13,7 @@ public class TransactionFileHandler extends BaseFileHandler {
         super(filePath);
     }
 
+    // ================= ADD =================
     @Override
     public void add(Object obj) {
 
@@ -32,6 +34,7 @@ public class TransactionFileHandler extends BaseFileHandler {
         writeAll(data);
     }
 
+    // ================= UPDATE =================
     @Override
     public void update(Object obj) {
 
@@ -41,22 +44,24 @@ public class TransactionFileHandler extends BaseFileHandler {
 
         for (String[] row : data) {
 
-            if (Integer.parseInt(row[0]) == t.getId()) {
+            try {
+                if (Integer.parseInt(row[0]) == t.getId()) {
 
-                row[1] = String.valueOf(t.getUserId());
-                row[2] = t.getType();
-                row[3] = t.getCategory();
-                row[4] = String.valueOf(t.getAmount());
-                row[5] = t.getNote();
-                row[6] = t.getDate() != null
-                        ? t.getDate().toString()
-                        : "";
-            }
+                    row[1] = String.valueOf(t.getUserId());
+                    row[2] = t.getType();
+                    row[3] = t.getCategory();
+                    row[4] = String.valueOf(t.getAmount());
+                    row[5] = t.getNote();
+                    row[6] = t.getDate() != null ? t.getDate().toString() : "";
+                }
+
+            } catch (Exception ignored) {}
         }
 
         writeAll(data);
     }
 
+    // ================= DELETE =================
     @Override
     public void delete(int id) {
 
@@ -65,17 +70,17 @@ public class TransactionFileHandler extends BaseFileHandler {
 
         for (String[] row : data) {
 
-            if (Integer.parseInt(row[0]) != id) {
-                updated.add(row);
-            }
+            try {
+                if (Integer.parseInt(row[0]) != id) {
+                    updated.add(row);
+                }
+            } catch (Exception ignored) {}
         }
 
         writeAll(updated);
     }
 
-    // =====================================
-    // GET ALL TRANSACTIONS OF A USER
-    // =====================================
+    // ================= GET BY USER =================
     public List<Transaction> getByUser(int userId) {
 
         List<String[]> data = readAll();
@@ -83,52 +88,96 @@ public class TransactionFileHandler extends BaseFileHandler {
 
         for (String[] row : data) {
 
-            if (Integer.parseInt(row[1]) == userId) {
+            try {
+                if (Integer.parseInt(row[1]) == userId) {
 
-                Date date;
+                    Date date;
 
-                try {
-
-                    if (row.length > 6
-                            && row[6] != null
-                            && !row[6].isEmpty()) {
-
+                    if (row.length > 6 && row[6] != null && !row[6].isEmpty()) {
                         date = Date.valueOf(row[6].trim());
-
                     } else {
-
-                        date = new Date(
-                                System.currentTimeMillis()
-                        );
+                        date = new Date(System.currentTimeMillis());
                     }
 
-                } catch (Exception e) {
-
-                    date = new Date(
-                            System.currentTimeMillis()
-                    );
+                    result.add(new Transaction(
+                            Integer.parseInt(row[0]),
+                            Integer.parseInt(row[1]),
+                            row[2],
+                            row[3],
+                            Double.parseDouble(row[4]),
+                            row[5],
+                            date
+                    ));
                 }
 
-                Transaction t = new Transaction(
-                        Integer.parseInt(row[0]),
-                        Integer.parseInt(row[1]),
-                        row[2],
-                        row[3],
-                        Double.parseDouble(row[4]),
-                        row[5],
-                        date
-                );
-
-                result.add(t);
-            }
+            } catch (Exception ignored) {}
         }
 
         return result;
     }
 
-    // =====================================
-    // TOTAL SPENT BY CATEGORY
-    // =====================================
+    // =========================================================
+    // 🔥 DAY 6 REQUIRED FEATURE: SEARCH WITH MULTIPLE FILTERS
+    // =========================================================
+    public List<Transaction> search(
+            int userId,
+            String category,
+            String type,
+            String startDate,
+            String endDate,
+            String keyword
+    ) {
+
+        List<Transaction> all = getByUser(userId);
+        List<Transaction> result = new ArrayList<>();
+
+        for (Transaction t : all) {
+
+            try {
+
+                // ---------------- CATEGORY FILTER ----------------
+                if (!category.equalsIgnoreCase("All")
+                        && !t.getCategory().equalsIgnoreCase(category)) {
+                    continue;
+                }
+
+                // ---------------- TYPE FILTER ----------------
+                if (!type.equalsIgnoreCase("All")
+                        && !t.getType().equalsIgnoreCase(type)) {
+                    continue;
+                }
+
+                // ---------------- DATE FILTER ----------------
+                LocalDate txDate = t.getDate().toLocalDate();
+
+                if (startDate != null && !startDate.isEmpty()) {
+                    LocalDate start = LocalDate.parse(startDate);
+                    if (txDate.isBefore(start)) continue;
+                }
+
+                if (endDate != null && !endDate.isEmpty()) {
+                    LocalDate end = LocalDate.parse(endDate);
+                    if (txDate.isAfter(end)) continue;
+                }
+
+                // ---------------- KEYWORD FILTER ----------------
+                if (keyword != null && !keyword.trim().isEmpty()) {
+                    String note = t.getNote() == null ? "" : t.getNote().toLowerCase();
+
+                    if (!note.contains(keyword.toLowerCase())) {
+                        continue;
+                    }
+                }
+
+                result.add(t);
+
+            } catch (Exception ignored) {}
+        }
+
+        return result;
+    }
+
+    // ================= TOTAL BY CATEGORY =================
     public double getTotalByCategory(
             int userId,
             String category,
@@ -138,8 +187,7 @@ public class TransactionFileHandler extends BaseFileHandler {
 
         double total = 0;
 
-        List<Transaction> transactions =
-                getByUser(userId);
+        List<Transaction> transactions = getByUser(userId);
 
         for (Transaction t : transactions) {
 
@@ -153,9 +201,7 @@ public class TransactionFileHandler extends BaseFileHandler {
                     total += t.getAmount();
                 }
 
-            } catch (Exception e) {
-                // Skip bad transaction
-            }
+            } catch (Exception ignored) {}
         }
 
         return total;

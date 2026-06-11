@@ -2,3 +2,7 @@
 3,1,Income,Food,300.0,testing,2026-06-09
 4,1,Income,Food,300.0,testing,2026-06-09
 5,1,Expense,Transport,500.0,going to lahore to karachi,2026-06-09
+6,1,Expense,Transport,200.0,,2026-06-11
+7,1,Income,Food,300.0,testing,2026-06-09
+8,1,Expense,Rent,1000.0,,2026-06-11
+9,1,Expense,Rent,1000.0,,2025-06-11

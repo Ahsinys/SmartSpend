@@ -75,10 +75,81 @@ public class BudgetPanel extends JPanel {
 
         // ================= TABLE =================
         tableModel = new DefaultTableModel(
-                new String[]{"Category", "Limit", "Spent", "Remaining", "Status"}, 0
-        );
+                new String[]{
+                        "Category",
+                        "Limit",
+                        "Spent",
+                        "Remaining",
+                        "Status"
+                },
+                0
+        ) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+
+                // Only Spent column editable
+                return column == 2;
+            }
+        };
 
         budgetTable = new JTable(tableModel);
+
+        tableModel.addTableModelListener(e -> {
+
+            int row = e.getFirstRow();
+            int column = e.getColumn();
+
+            if (column == 2) {
+
+                try {
+
+                    double limit = Double.parseDouble(
+                            tableModel.getValueAt(row, 1).toString()
+                    );
+
+                    double spent = Double.parseDouble(
+                            tableModel.getValueAt(row, 2).toString()
+                    );
+
+                    double remaining = limit - spent;
+
+                    tableModel.setValueAt(
+                            remaining,
+                            row,
+                            3
+                    );
+
+                    String status;
+
+                    if (spent < limit * 0.80) {
+
+                        status = "OK";
+
+                    } else if (spent <= limit) {
+
+                        status = "WARNING";
+
+                    } else {
+
+                        status = "OVER BUDGET";
+                    }
+
+                    tableModel.setValueAt(
+                            status,
+                            row,
+                            4
+                    );
+
+                } catch (Exception ex) {
+
+                    JOptionPane.showMessageDialog(
+                            this,
+                            "Invalid spent amount"
+                    );
+                }
+            }
+        });
+
 
         budgetTable.getColumnModel()
                 .getColumn(4)
@@ -156,12 +227,7 @@ public class BudgetPanel extends JPanel {
 
         for (Budget b : budgets) {
 
-            double spent = budgetService.getSpent(
-                    b.getUserId(),
-                    b.getCategory(),
-                    b.getMonth(),
-                    b.getYear()
-            );
+            double spent = 0;
 
             double remaining = budgetService.getRemaining(b, spent);
 
