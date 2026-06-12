@@ -20,12 +20,15 @@ public class BudgetPanel extends JPanel {
     private JSpinner yearSpinner;
 
     private JButton saveButton;
+    private JButton deleteButton;
 
     private JTable budgetTable;
     private DefaultTableModel tableModel;
 
     private BudgetService budgetService;
     private BudgetFileHandler budgetFileHandler;
+
+    private int selectedBudgetId = -1;
 
     public BudgetPanel() {
 
@@ -35,34 +38,16 @@ public class BudgetPanel extends JPanel {
         setLayout(new BorderLayout());
 
         // ================= HEADING =================
-        JLabel headingLabel = new JLabel(
-                "Budget Management",
-                SwingConstants.CENTER
-        );
-
-        headingLabel.setFont(
-                new Font("Arial", Font.BOLD, 24)
-        );
-
-        headingLabel.setBorder(
-                BorderFactory.createEmptyBorder(
-                        10, 0, 20, 0
-                )
-        );
+        JLabel headingLabel = new JLabel("Budget Management", SwingConstants.CENTER);
+        headingLabel.setFont(new Font("Arial", Font.BOLD, 24));
+        headingLabel.setBorder(BorderFactory.createEmptyBorder(10, 0, 20, 0));
 
         // ================= FORM =================
-        JPanel formPanel = new JPanel(
-                new GridLayout(2, 4, 10, 10)
-        );
+        JPanel formPanel = new JPanel(new GridLayout(2, 4, 10, 10));
 
         categoryCombo = new JComboBox<>(new String[]{
-                "Food",
-                "Transport",
-                "Rent",
-                "Education",
-                "Health",
-                "Entertainment",
-                "Other"
+                "Food", "Transport", "Rent",
+                "Education", "Health", "Entertainment", "Other"
         });
 
         limitField = new JTextField();
@@ -70,32 +55,17 @@ public class BudgetPanel extends JPanel {
         LocalDate now = LocalDate.now();
 
         monthSpinner = new JSpinner(
-                new SpinnerNumberModel(
-                        now.getMonthValue(),
-                        1,
-                        12,
-                        1
-                )
+                new SpinnerNumberModel(now.getMonthValue(), 1, 12, 1)
         );
 
         yearSpinner = new JSpinner(
-                new SpinnerNumberModel(
-                        now.getYear(),
-                        2020,
-                        2100,
-                        1
-                )
+                new SpinnerNumberModel(now.getYear(), 2020, 2100, 1)
         );
 
-        // Remove commas in year (2026 instead of 2,026)
-        yearSpinner.setEditor(
-                new JSpinner.NumberEditor(
-                        yearSpinner,
-                        "#"
-                )
-        );
+        yearSpinner.setEditor(new JSpinner.NumberEditor(yearSpinner, "#"));
 
         saveButton = new JButton("Save Budget");
+        deleteButton = new JButton("Delete");
 
         formPanel.add(new JLabel("Category"));
         formPanel.add(categoryCombo);
@@ -110,123 +80,48 @@ public class BudgetPanel extends JPanel {
         formPanel.add(yearSpinner);
 
         // ================= TOP PANEL =================
-        JPanel topPanel = new JPanel(
-                new BorderLayout()
-        );
+        JPanel topPanel = new JPanel(new BorderLayout());
+        topPanel.add(headingLabel, BorderLayout.NORTH);
+        topPanel.add(formPanel, BorderLayout.CENTER);
 
-        topPanel.add(
-                headingLabel,
-                BorderLayout.NORTH
-        );
-
-        topPanel.add(
-                formPanel,
-                BorderLayout.CENTER
-        );
-
-        add(
-                topPanel,
-                BorderLayout.NORTH
-        );
+        add(topPanel, BorderLayout.NORTH);
 
         // ================= TABLE =================
         tableModel = new DefaultTableModel(
-                new String[]{
-                        "Category",
-                        "Limit",
-                        "Spent",
-                        "Remaining",
-                        "Status"
-                },
+                new String[]{"ID", "Category", "Limit", "Spent", "Remaining", "Status"},
                 0
         ) {
             @Override
-            public boolean isCellEditable(
-                    int row,
-                    int column
-            ) {
-                return column == 2;
+            public boolean isCellEditable(int row, int column) {
+                return column >= 0 && column <= 3;
             }
         };
 
         budgetTable = new JTable(tableModel);
 
-        tableModel.addTableModelListener(e -> {
+        budgetTable.getSelectionModel().addListSelectionListener(e -> {
 
-            int row = e.getFirstRow();
-            int column = e.getColumn();
+            int row = budgetTable.getSelectedRow();
 
-            if (column == 2) {
-
-                try {
-
-                    double limit =
-                            Double.parseDouble(
-                                    tableModel.getValueAt(row, 1)
-                                            .toString()
-                            );
-
-                    double spent =
-                            Double.parseDouble(
-                                    tableModel.getValueAt(row, 2)
-                                            .toString()
-                            );
-
-                    double remaining =
-                            limit - spent;
-
-                    tableModel.setValueAt(
-                            remaining,
-                            row,
-                            3
-                    );
-
-                    String status;
-
-                    if (spent < limit * 0.80) {
-
-                        status = "OK";
-
-                    } else if (spent <= limit) {
-
-                        status = "WARNING";
-
-                    } else {
-
-                        status = "OVER BUDGET";
-                    }
-
-                    tableModel.setValueAt(
-                            status,
-                            row,
-                            4
-                    );
-
-                } catch (Exception ex) {
-
-                    JOptionPane.showMessageDialog(
-                            this,
-                            "Invalid spent amount"
-                    );
-                }
+            if (row >= 0) {
+                selectedBudgetId = Integer.parseInt(
+                        tableModel.getValueAt(row, 0).toString()
+                );
             }
         });
 
         budgetTable.getColumnModel()
-                .getColumn(4)
-                .setCellRenderer(
-                        new StatusCellRenderer()
-                );
+                .getColumn(5)
+                .setCellRenderer(new StatusCellRenderer());
 
-        add(
-                new JScrollPane(budgetTable),
-                BorderLayout.CENTER
-        );
+        add(new JScrollPane(budgetTable), BorderLayout.CENTER);
 
-        add(
-                saveButton,
-                BorderLayout.SOUTH
-        );
+        // ================= BUTTON PANEL =================
+        JPanel bottomPanel = new JPanel(new FlowLayout());
+        bottomPanel.add(saveButton);
+        bottomPanel.add(deleteButton);
+
+        add(bottomPanel, BorderLayout.SOUTH);
 
         // ================= SAVE =================
         saveButton.addActionListener(e -> {
@@ -236,44 +131,53 @@ public class BudgetPanel extends JPanel {
                 Budget budget = new Budget(
                         generateBudgetId(),
                         Session.currentUser.getId(),
-                        categoryCombo
-                                .getSelectedItem()
-                                .toString(),
-                        Double.parseDouble(
-                                limitField.getText()
-                        ),
+                        categoryCombo.getSelectedItem().toString(),
+                        Double.parseDouble(limitField.getText()),
                         (Integer) monthSpinner.getValue(),
                         (Integer) yearSpinner.getValue()
                 );
 
                 budgetService.saveBudget(budget);
 
-                JOptionPane.showMessageDialog(
-                        this,
-                        "Budget Saved Successfully"
-                );
+                JOptionPane.showMessageDialog(this, "Budget Saved Successfully");
 
                 loadBudgets();
-
                 limitField.setText("");
 
             } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Invalid Budget Data");
+            }
+        });
 
-                JOptionPane.showMessageDialog(
-                        this,
-                        "Invalid Budget Data"
-                );
+        // ================= DELETE =================
+        deleteButton.addActionListener(e -> {
+
+            if (selectedBudgetId == -1) {
+                JOptionPane.showMessageDialog(this, "Select a row first");
+                return;
+            }
+
+            int confirm = JOptionPane.showConfirmDialog(
+                    this,
+                    "Are you sure you want to delete this budget?",
+                    "Confirm Delete",
+                    JOptionPane.YES_NO_OPTION
+            );
+
+            if (confirm == JOptionPane.YES_OPTION) {
+
+                budgetFileHandler.delete(selectedBudgetId);
+
+                JOptionPane.showMessageDialog(this, "Budget Deleted");
+
+                loadBudgets();
+                selectedBudgetId = -1;
             }
         });
 
         // ================= AUTO REFRESH =================
-        monthSpinner.addChangeListener(
-                e -> loadBudgets()
-        );
-
-        yearSpinner.addChangeListener(
-                e -> loadBudgets()
-        );
+        monthSpinner.addChangeListener(e -> loadBudgets());
+        yearSpinner.addChangeListener(e -> loadBudgets());
 
         loadBudgets();
     }
@@ -281,22 +185,14 @@ public class BudgetPanel extends JPanel {
     // ================= ID GENERATOR =================
     private int generateBudgetId() {
 
-        List<String[]> data =
-                budgetFileHandler.getAllRows();
+        List<String[]> data = budgetFileHandler.getAllRows();
 
         int maxId = 0;
 
         for (String[] row : data) {
-
             try {
-
-                maxId = Math.max(
-                        maxId,
-                        Integer.parseInt(row[0])
-                );
-
-            } catch (Exception ignored) {
-            }
+                maxId = Math.max(maxId, Integer.parseInt(row[0]));
+            } catch (Exception ignored) {}
         }
 
         return maxId + 1;
@@ -307,26 +203,22 @@ public class BudgetPanel extends JPanel {
 
         tableModel.setRowCount(0);
 
-        List<Budget> budgets =
-                budgetFileHandler.getAllBudgets();
+        List<Budget> budgets = budgetFileHandler.getAllBudgets();
 
         for (Budget b : budgets) {
 
-            double spent = 0;
+            double spent = budgetService.getSpent(
+                    b.getUserId(),
+                    b.getCategory(),
+                    b.getMonth(),
+                    b.getYear()
+            );
 
-            double remaining =
-                    budgetService.getRemaining(
-                            b,
-                            spent
-                    );
-
-            String status =
-                    budgetService.getStatus(
-                            b.getLimitAmount(),
-                            spent
-                    );
+            double remaining = budgetService.getRemaining(b, spent);
+            String status = budgetService.getStatus(b.getLimitAmount(), spent);
 
             tableModel.addRow(new Object[]{
+                    b.getId(),
                     b.getCategory(),
                     b.getLimitAmount(),
                     spent,
