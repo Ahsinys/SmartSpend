@@ -12,10 +12,6 @@ import java.awt.*;
 import java.time.LocalDate;
 import java.util.List;
 
-/**
- * Dashboard panel showing monthly summary
- * and current budget status.
- */
 public class DashboardPanel extends JPanel {
 
     private JLabel incomeLabel;
@@ -41,223 +37,113 @@ public class DashboardPanel extends JPanel {
         LocalDate now = LocalDate.now();
 
         monthLabel = new JLabel(
-                "Dashboard Summary - "
-                        + now.getMonth()
-                        + " "
-                        + now.getYear(),
+                "Dashboard Summary - " + now.getMonth() + " " + now.getYear(),
                 SwingConstants.CENTER
         );
 
-        monthLabel.setFont(new Font("Arial", Font.BOLD, 20)
-        );
+        monthLabel.setFont(new Font("Arial", Font.BOLD, 20));
 
-        // =======================
-        // SUMMARY CARDS
-        // =======================
+        // ===================== SUMMARY CARDS =====================
         JPanel cardsPanel = new JPanel(new GridLayout(1, 3, 10, 10));
 
         incomeLabel = new JLabel("0.00", SwingConstants.CENTER);
         expenseLabel = new JLabel("0.00", SwingConstants.CENTER);
         savingsLabel = new JLabel("0.00", SwingConstants.CENTER);
 
-        cardsPanel.add(createCard(
-                "Total Income",
-                incomeLabel
-        ));
+        cardsPanel.add(createCard("Total Income", incomeLabel));
+        cardsPanel.add(createCard("Total Expenses", expenseLabel));
+        cardsPanel.add(createCard("Savings", savingsLabel));
 
-        cardsPanel.add(createCard(
-                "Total Expenses",
-                expenseLabel
-        ));
-
-        cardsPanel.add(createCard(
-                "Savings",
-                savingsLabel
-        ));
-
-        JPanel topPanel =
-                new JPanel(new BorderLayout());
-
-        topPanel.add(
-                monthLabel,
-                BorderLayout.NORTH
-        );
-
-        topPanel.add(
-                cardsPanel,
-                BorderLayout.CENTER
-        );
+        JPanel topPanel = new JPanel(new BorderLayout());
+        topPanel.add(monthLabel, BorderLayout.NORTH);
+        topPanel.add(cardsPanel, BorderLayout.CENTER);
 
         add(topPanel, BorderLayout.NORTH);
 
-        // =======================
-        // BUDGET TABLE
-        // =======================
+        // ===================== TABLE (FIXED HERE) =====================
         tableModel = new DefaultTableModel(
-                new String[]{
-                        "Category",
-                        "Limit",
-                        "Spent",
-                        "Remaining",
-                        "Status"
-                },
+                new String[]{"Category", "Limit", "Spent", "Remaining", "Status"},
                 0
-        );
+        ) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false; // 🚫 makes FULL table uneditable
+            }
+        };
 
         budgetTable = new JTable(tableModel);
 
         budgetTable.getColumnModel()
                 .getColumn(4)
-                .setCellRenderer(
-                        new StatusCellRenderer()
-                );
+                .setCellRenderer(new StatusCellRenderer());
 
-        add(
-                new JScrollPane(budgetTable),
-                BorderLayout.CENTER
-        );
+        add(new JScrollPane(budgetTable), BorderLayout.CENTER);
 
         loadDashboard();
     }
 
-    /**
-     * Creates summary card panel.
-     */
-    private JPanel createCard(
-            String title,
-            JLabel valueLabel
-    ) {
+    private JPanel createCard(String title, JLabel valueLabel) {
 
-        JPanel card =
-                new JPanel(new BorderLayout());
+        JPanel card = new JPanel(new BorderLayout());
 
-        card.setBorder(
-                BorderFactory.createTitledBorder(title)
-        );
+        card.setBorder(BorderFactory.createTitledBorder(title));
 
-        valueLabel.setFont(
-                new Font(
-                        "Arial",
-                        Font.BOLD,
-                        24
-                )
-        );
+        valueLabel.setFont(new Font("Arial", Font.BOLD, 24));
 
-        card.add(
-                valueLabel,
-                BorderLayout.CENTER
-        );
+        card.add(valueLabel, BorderLayout.CENTER);
 
         return card;
     }
 
-    /**
-     * Loads dashboard data.
-     */
     private void loadDashboard() {
 
         if (Session.currentUser == null) {
             return;
         }
 
-        int userId =
-                Session.currentUser.getId();
+        int userId = Session.currentUser.getId();
 
-        LocalDate now =
-                LocalDate.now();
+        LocalDate now = LocalDate.now();
 
-        int month =
-                now.getMonthValue();
+        int month = now.getMonthValue();
+        int year = now.getYear();
 
-        int year =
-                now.getYear();
+        double income = reportService.getTotalIncome(userId, month, year);
+        double expenses = reportService.getTotalExpenses(userId, month, year);
+        double savings = reportService.getSavings(userId, month, year);
 
-        // =======================
-        // REPORT DATA
-        // =======================
-        double income =
-                reportService.getTotalIncome(
-                        userId,
-                        month,
-                        year
-                );
+        incomeLabel.setText(String.format("%.2f", income));
+        expenseLabel.setText(String.format("%.2f", expenses));
+        savingsLabel.setText(String.format("%.2f", savings));
 
-        double expenses =
-                reportService.getTotalExpenses(
-                        userId,
-                        month,
-                        year
-                );
-
-        double savings =
-                reportService.getSavings(
-                        userId,
-                        month,
-                        year
-                );
-
-        incomeLabel.setText(
-                String.format("%.2f", income)
-        );
-
-        expenseLabel.setText(
-                String.format("%.2f", expenses)
-        );
-
-        savingsLabel.setText(
-                String.format("%.2f", savings)
-        );
-
-        // =======================
-        // BUDGET TABLE
-        // =======================
         tableModel.setRowCount(0);
 
         List<Budget> budgets =
-                budgetFileHandler.getByUser(
-                        userId,
-                        month,
-                        year
-                );
+                budgetFileHandler.getByUser(userId, month, year);
 
         for (Budget budget : budgets) {
 
-            double spent =
-                    budgetService.getSpent(
-                            userId,
-                            budget.getCategory(),
-                            month,
-                            year
-                    );
-
-            double remaining =
-                    budgetService.getRemaining(
-                            budget,
-                            spent
-                    );
-
-            String status =
-                    budgetService.getStatus(
-                            budget.getLimitAmount(),
-                            spent
-                    );
-
-            tableModel.addRow(
-                    new Object[]{
-                            budget.getCategory(),
-                            budget.getLimitAmount(),
-                            spent,
-                            remaining,
-                            status
-                    }
+            double spent = budgetService.getSpent(
+                    userId,
+                    budget.getCategory(),
+                    month,
+                    year
             );
+
+            double remaining = budgetService.getRemaining(budget, spent);
+
+            String status = budgetService.getStatus(budget.getLimitAmount(), spent);
+
+            tableModel.addRow(new Object[]{
+                    budget.getCategory(),
+                    budget.getLimitAmount(),
+                    spent,
+                    remaining,
+                    status
+            });
         }
     }
 
-    /**
-     * Refresh dashboard whenever
-     * panel becomes visible.
-     */
     @Override
     public void setVisible(boolean visible) {
 
