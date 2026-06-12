@@ -106,10 +106,17 @@ public class SearchPanel extends JPanel {
         tableModel = new DefaultTableModel(
                 new String[]{"Type", "Category", "Amount", "Note", "Date"},
                 0
-        );
+        ) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
 
         table = new JTable(tableModel);
-        add(new JScrollPane(table), BorderLayout.CENTER);
+
+        JScrollPane scrollPane = new JScrollPane(table);
+        add(scrollPane, BorderLayout.CENTER);
 
         // ================= BOTTOM PANEL =================
         JPanel bottomPanel = new JPanel(new BorderLayout());

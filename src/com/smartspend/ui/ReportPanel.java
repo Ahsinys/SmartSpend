@@ -135,7 +135,12 @@ public class ReportPanel extends JPanel {
                         "Amount"
                 },
                 0
-        );
+        ) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
 
         table = new JTable(tableModel);
 
