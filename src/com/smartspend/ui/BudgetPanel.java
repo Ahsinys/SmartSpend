@@ -93,7 +93,10 @@ public class BudgetPanel extends JPanel {
         ) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return column >= 0 && column <= 3;
+
+                return column == 2   // Limit
+                        || column == 3   // Spent
+                        || column == 5;  // Status
             }
         };
 
@@ -115,6 +118,48 @@ public class BudgetPanel extends JPanel {
                 .setCellRenderer(new StatusCellRenderer());
 
         add(new JScrollPane(budgetTable), BorderLayout.CENTER);
+
+
+
+        tableModel.addTableModelListener(e -> {
+
+            int row = e.getFirstRow();
+            int column = e.getColumn();
+
+            // ONLY react when "Spent" column is edited
+            if (column == 3) {
+
+                try {
+                    double limit = Double.parseDouble(
+                            tableModel.getValueAt(row, 2).toString()
+                    );
+
+                    double spent = Double.parseDouble(
+                            tableModel.getValueAt(row, 3).toString()
+                    );
+
+                    double remaining = limit - spent;
+
+                    tableModel.setValueAt(remaining, row, 4);
+
+                    String status;
+
+                    if (spent < limit * 0.80) {
+                        status = "OK";
+                    } else if (spent <= limit) {
+                        status = "WARNING";
+                    } else {
+                        status = "OVER BUDGET";
+                    }
+
+                    tableModel.setValueAt(status, row, 5);
+
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(this, "Invalid spent value");
+                }
+            }
+        });
+
 
         // ================= BUTTON PANEL =================
         JPanel bottomPanel = new JPanel(new FlowLayout());
