@@ -210,6 +210,7 @@ Fully modular architecture (Model → FileHandler → Service → UI)
 Final Project Status 
 
 **SmartSpend Project is now COMPLETE**
+
 Final Features:
 User Authentication System
 Transaction CRUD System
@@ -229,4 +230,5 @@ Session Management
 
 
 **Conclusion**
+
 SmartSpend is a fully functional personal finance management desktop application built using Java Swing with a clean layered architecture and file-based persistence system.
