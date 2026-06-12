@@ -45,8 +45,7 @@ public class MainFrame extends JFrame {
         cardLayout = new CardLayout();
         contentPanel = new JPanel(cardLayout);
 
-        JPanel dashboardPanel = new JPanel();
-        dashboardPanel.add(new JLabel("Dashboard Panel"));
+        DashboardPanel dashboardPanel = new DashboardPanel();
 
         TransactionPanel transactionPanel = new TransactionPanel();
 
