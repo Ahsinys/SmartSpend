@@ -30,82 +30,189 @@ public class ReportPanel extends JPanel {
 
         setLayout(new BorderLayout());
 
+        // ================= HEADING =================
+        JLabel headingLabel = new JLabel(
+                "Monthly Financial Reports",
+                SwingConstants.CENTER
+        );
+
+        headingLabel.setFont(
+                new Font("Arial", Font.BOLD, 24)
+        );
+
+        headingLabel.setBorder(
+                BorderFactory.createEmptyBorder(
+                        10, 0, 20, 0
+                )
+        );
+
         // ================= TOP FILTER =================
         JPanel topPanel = new JPanel(new FlowLayout());
 
-        monthSpinner = new JSpinner(new SpinnerNumberModel(1, 1, 12, 1));
-        yearSpinner = new JSpinner(new SpinnerNumberModel(2026, 2020, 2100, 1));
+        monthSpinner = new JSpinner(
+                new SpinnerNumberModel(1, 1, 12, 1)
+        );
+
+        yearSpinner = new JSpinner(
+                new SpinnerNumberModel(2026, 2015, 2100, 1)
+        );
+
+        // Remove comma formatting (2,026 → 2026)
+        yearSpinner.setEditor(
+                new JSpinner.NumberEditor(yearSpinner, "#")
+        );
 
         generateButton = new JButton("Generate Report");
 
         topPanel.add(new JLabel("Month:"));
         topPanel.add(monthSpinner);
+
         topPanel.add(new JLabel("Year:"));
         topPanel.add(yearSpinner);
+
         topPanel.add(generateButton);
 
-        add(topPanel, BorderLayout.NORTH);
+        // ================= HEADER SECTION =================
+        JPanel headerPanel = new JPanel(
+                new BorderLayout()
+        );
+
+        headerPanel.add(
+                headingLabel,
+                BorderLayout.NORTH
+        );
+
+        headerPanel.add(
+                topPanel,
+                BorderLayout.CENTER
+        );
+
+        add(
+                headerPanel,
+                BorderLayout.NORTH
+        );
 
         // ================= SUMMARY PANEL =================
-        JPanel summaryPanel = new JPanel(new GridLayout(3, 1));
+        JPanel summaryPanel = new JPanel(
+                new GridLayout(3, 1, 5, 5)
+        );
+
+        summaryPanel.setBorder(
+                BorderFactory.createTitledBorder(
+                        "Summary"
+                )
+        );
 
         incomeLabel = new JLabel("Total Income: 0");
         expenseLabel = new JLabel("Total Expenses: 0");
         savingsLabel = new JLabel("Savings: 0");
 
-        incomeLabel.setFont(new Font("Arial", Font.BOLD, 16));
-        expenseLabel.setFont(new Font("Arial", Font.BOLD, 16));
-        savingsLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        incomeLabel.setFont(
+                new Font("Arial", Font.BOLD, 16)
+        );
+
+        expenseLabel.setFont(
+                new Font("Arial", Font.BOLD, 16)
+        );
+
+        savingsLabel.setFont(
+                new Font("Arial", Font.BOLD, 16)
+        );
 
         summaryPanel.add(incomeLabel);
         summaryPanel.add(expenseLabel);
         summaryPanel.add(savingsLabel);
 
-        add(summaryPanel, BorderLayout.WEST);
+        add(
+                summaryPanel,
+                BorderLayout.WEST
+        );
 
         // ================= TABLE =================
         tableModel = new DefaultTableModel(
-                new String[]{"Category", "Amount"},
+                new String[]{
+                        "Category",
+                        "Amount"
+                },
                 0
         );
 
         table = new JTable(tableModel);
 
-        add(new JScrollPane(table), BorderLayout.CENTER);
+        add(
+                new JScrollPane(table),
+                BorderLayout.CENTER
+        );
 
         // ================= ACTION =================
-        generateButton.addActionListener(e -> generateReport());
+        generateButton.addActionListener(
+                e -> generateReport()
+        );
     }
 
     // ================= GENERATE REPORT =================
     private void generateReport() {
 
         int userId = Session.currentUser.getId();
-        int month = (Integer) monthSpinner.getValue();
-        int year = (Integer) yearSpinner.getValue();
 
-        // ===== CALCULATIONS =====
-        double income = reportService.getTotalIncome(userId, month, year);
-        double expense = reportService.getTotalExpenses(userId, month, year);
-        double savings = reportService.getSavings(userId, month, year);
+        int month =
+                (Integer) monthSpinner.getValue();
 
-        // ===== UPDATE LABELS =====
-        incomeLabel.setText("Total Income: " + income);
-        expenseLabel.setText("Total Expenses: " + expense);
-        savingsLabel.setText("Savings: " + savings);
+        int year =
+                (Integer) yearSpinner.getValue();
 
-        // ===== LOAD CATEGORY BREAKDOWN =====
+        double income =
+                reportService.getTotalIncome(
+                        userId,
+                        month,
+                        year
+                );
+
+        double expense =
+                reportService.getTotalExpenses(
+                        userId,
+                        month,
+                        year
+                );
+
+        double savings =
+                reportService.getSavings(
+                        userId,
+                        month,
+                        year
+                );
+
+        // Update labels
+        incomeLabel.setText(
+                "Total Income: " + income
+        );
+
+        expenseLabel.setText(
+                "Total Expenses: " + expense
+        );
+
+        savingsLabel.setText(
+                "Savings: " + savings
+        );
+
+        // Load category breakdown
         Map<String, Double> map =
-                reportService.getCategoryBreakdown(userId, month, year);
+                reportService.getCategoryBreakdown(
+                        userId,
+                        month,
+                        year
+                );
 
         tableModel.setRowCount(0);
 
         for (Map.Entry<String, Double> entry : map.entrySet()) {
 
-            tableModel.addRow(new Object[]{
-                    entry.getKey(),
-                    entry.getValue()
-            });
+            tableModel.addRow(
+                    new Object[]{
+                            entry.getKey(),
+                            entry.getValue()
+                    }
+            );
         }
     }
 }

@@ -35,6 +35,22 @@ public class SearchPanel extends JPanel {
 
         setLayout(new BorderLayout());
 
+        // ================= HEADING =================
+        JLabel headingLabel = new JLabel(
+                "Search Transactions",
+                SwingConstants.CENTER
+        );
+
+        headingLabel.setFont(
+                new Font("Arial", Font.BOLD, 24)
+        );
+
+        headingLabel.setBorder(
+                BorderFactory.createEmptyBorder(
+                        10, 0, 20, 0
+                )
+        );
+
         // ================= FILTER PANEL =================
         JPanel filterPanel = new JPanel(new GridLayout(2, 5, 10, 10));
 
@@ -66,7 +82,25 @@ public class SearchPanel extends JPanel {
         filterPanel.add(endDateField);
         filterPanel.add(keywordField);
 
-        add(filterPanel, BorderLayout.NORTH);
+        // ================= TOP PANEL =================
+        JPanel topPanel = new JPanel(
+                new BorderLayout()
+        );
+
+        topPanel.add(
+                headingLabel,
+                BorderLayout.NORTH
+        );
+
+        topPanel.add(
+                filterPanel,
+                BorderLayout.CENTER
+        );
+
+        add(
+                topPanel,
+                BorderLayout.NORTH
+        );
 
         // ================= TABLE =================
         tableModel = new DefaultTableModel(

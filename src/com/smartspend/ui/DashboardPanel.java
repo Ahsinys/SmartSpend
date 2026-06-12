@@ -34,10 +34,9 @@ public class DashboardPanel extends JPanel {
 
         reportService = new ReportService();
         budgetService = new BudgetService();
-        budgetFileHandler =
-                new BudgetFileHandler("data/budgets.csv");
+        budgetFileHandler = new BudgetFileHandler("data/budgets.csv");
 
-        setLayout(new BorderLayout(15, 15));
+        setLayout(new BorderLayout(30, 30));
 
         LocalDate now = LocalDate.now();
 
@@ -49,15 +48,13 @@ public class DashboardPanel extends JPanel {
                 SwingConstants.CENTER
         );
 
-        monthLabel.setFont(
-                new Font("Arial", Font.BOLD, 18)
+        monthLabel.setFont(new Font("Arial", Font.BOLD, 20)
         );
 
         // =======================
         // SUMMARY CARDS
         // =======================
-        JPanel cardsPanel =
-                new JPanel(new GridLayout(1, 3, 10, 10));
+        JPanel cardsPanel = new JPanel(new GridLayout(1, 3, 10, 10));
 
         incomeLabel = new JLabel("0.00", SwingConstants.CENTER);
         expenseLabel = new JLabel("0.00", SwingConstants.CENTER);

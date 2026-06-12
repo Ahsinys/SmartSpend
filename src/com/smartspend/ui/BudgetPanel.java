@@ -34,28 +34,66 @@ public class BudgetPanel extends JPanel {
 
         setLayout(new BorderLayout());
 
+        // ================= HEADING =================
+        JLabel headingLabel = new JLabel(
+                "Budget Management",
+                SwingConstants.CENTER
+        );
+
+        headingLabel.setFont(
+                new Font("Arial", Font.BOLD, 24)
+        );
+
+        headingLabel.setBorder(
+                BorderFactory.createEmptyBorder(
+                        10, 0, 20, 0
+                )
+        );
+
         // ================= FORM =================
-        JPanel formPanel = new JPanel(new GridLayout(2, 4, 10, 10));
+        JPanel formPanel = new JPanel(
+                new GridLayout(2, 4, 10, 10)
+        );
 
         categoryCombo = new JComboBox<>(new String[]{
-                "Food", "Transport", "Rent",
-                "Education", "Health", "Entertainment", "Other"
+                "Food",
+                "Transport",
+                "Rent",
+                "Education",
+                "Health",
+                "Entertainment",
+                "Other"
         });
 
         limitField = new JTextField();
 
         LocalDate now = LocalDate.now();
 
-        monthSpinner = new JSpinner(new SpinnerNumberModel(
-                now.getMonthValue(), 1, 12, 1
-        ));
+        monthSpinner = new JSpinner(
+                new SpinnerNumberModel(
+                        now.getMonthValue(),
+                        1,
+                        12,
+                        1
+                )
+        );
 
-        yearSpinner = new JSpinner(new SpinnerNumberModel(
-                now.getYear(), 2020, 2100, 1
-        ));
+        yearSpinner = new JSpinner(
+                new SpinnerNumberModel(
+                        now.getYear(),
+                        2020,
+                        2100,
+                        1
+                )
+        );
 
-        // FIX: remove grouping commas like 2,026
-        yearSpinner.setEditor(new JSpinner.NumberEditor(yearSpinner, "#"));
+        // Remove commas in year (2026 instead of 2,026)
+        yearSpinner.setEditor(
+                new JSpinner.NumberEditor(
+                        yearSpinner,
+                        "#"
+                )
+        );
 
         saveButton = new JButton("Save Budget");
 
@@ -71,7 +109,25 @@ public class BudgetPanel extends JPanel {
         formPanel.add(new JLabel("Year"));
         formPanel.add(yearSpinner);
 
-        add(formPanel, BorderLayout.NORTH);
+        // ================= TOP PANEL =================
+        JPanel topPanel = new JPanel(
+                new BorderLayout()
+        );
+
+        topPanel.add(
+                headingLabel,
+                BorderLayout.NORTH
+        );
+
+        topPanel.add(
+                formPanel,
+                BorderLayout.CENTER
+        );
+
+        add(
+                topPanel,
+                BorderLayout.NORTH
+        );
 
         // ================= TABLE =================
         tableModel = new DefaultTableModel(
@@ -85,9 +141,10 @@ public class BudgetPanel extends JPanel {
                 0
         ) {
             @Override
-            public boolean isCellEditable(int row, int column) {
-
-                // Only Spent column editable
+            public boolean isCellEditable(
+                    int row,
+                    int column
+            ) {
                 return column == 2;
             }
         };
@@ -103,15 +160,20 @@ public class BudgetPanel extends JPanel {
 
                 try {
 
-                    double limit = Double.parseDouble(
-                            tableModel.getValueAt(row, 1).toString()
-                    );
+                    double limit =
+                            Double.parseDouble(
+                                    tableModel.getValueAt(row, 1)
+                                            .toString()
+                            );
 
-                    double spent = Double.parseDouble(
-                            tableModel.getValueAt(row, 2).toString()
-                    );
+                    double spent =
+                            Double.parseDouble(
+                                    tableModel.getValueAt(row, 2)
+                                            .toString()
+                            );
 
-                    double remaining = limit - spent;
+                    double remaining =
+                            limit - spent;
 
                     tableModel.setValueAt(
                             remaining,
@@ -150,45 +212,68 @@ public class BudgetPanel extends JPanel {
             }
         });
 
-
         budgetTable.getColumnModel()
                 .getColumn(4)
-                .setCellRenderer(new StatusCellRenderer());
+                .setCellRenderer(
+                        new StatusCellRenderer()
+                );
 
-        add(new JScrollPane(budgetTable), BorderLayout.CENTER);
-        add(saveButton, BorderLayout.SOUTH);
+        add(
+                new JScrollPane(budgetTable),
+                BorderLayout.CENTER
+        );
+
+        add(
+                saveButton,
+                BorderLayout.SOUTH
+        );
 
         // ================= SAVE =================
         saveButton.addActionListener(e -> {
 
             try {
+
                 Budget budget = new Budget(
                         generateBudgetId(),
                         Session.currentUser.getId(),
-                        categoryCombo.getSelectedItem().toString(),
-                        Double.parseDouble(limitField.getText()),
+                        categoryCombo
+                                .getSelectedItem()
+                                .toString(),
+                        Double.parseDouble(
+                                limitField.getText()
+                        ),
                         (Integer) monthSpinner.getValue(),
                         (Integer) yearSpinner.getValue()
                 );
 
                 budgetService.saveBudget(budget);
 
-                JOptionPane.showMessageDialog(this, "Budget Saved Successfully");
-
-                System.out.println("Saved Budget -> " + budget.getCategory());
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Budget Saved Successfully"
+                );
 
                 loadBudgets();
+
                 limitField.setText("");
 
             } catch (Exception ex) {
-                ex.printStackTrace();
-                JOptionPane.showMessageDialog(this, "Invalid Budget Data");
+
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Invalid Budget Data"
+                );
             }
         });
 
         // ================= AUTO REFRESH =================
-        monthSpinner.addChangeListener(e -> loadBudgets());
-        yearSpinner.addChangeListener(e -> loadBudgets());
+        monthSpinner.addChangeListener(
+                e -> loadBudgets()
+        );
+
+        yearSpinner.addChangeListener(
+                e -> loadBudgets()
+        );
 
         loadBudgets();
     }
@@ -196,14 +281,22 @@ public class BudgetPanel extends JPanel {
     // ================= ID GENERATOR =================
     private int generateBudgetId() {
 
-        List<String[]> data = budgetFileHandler.getAllRows();
+        List<String[]> data =
+                budgetFileHandler.getAllRows();
 
         int maxId = 0;
 
         for (String[] row : data) {
+
             try {
-                maxId = Math.max(maxId, Integer.parseInt(row[0]));
-            } catch (Exception ignored) {}
+
+                maxId = Math.max(
+                        maxId,
+                        Integer.parseInt(row[0])
+                );
+
+            } catch (Exception ignored) {
+            }
         }
 
         return maxId + 1;
@@ -214,24 +307,24 @@ public class BudgetPanel extends JPanel {
 
         tableModel.setRowCount(0);
 
-        int userId = Session.currentUser.getId();
-        int month = (Integer) monthSpinner.getValue();
-        int year = (Integer) yearSpinner.getValue();
-
-        System.out.println("Loading budgets for: " + month + "/" + year);
-
         List<Budget> budgets =
                 budgetFileHandler.getAllBudgets();
-
-        System.out.println("Found budgets: " + budgets.size());
 
         for (Budget b : budgets) {
 
             double spent = 0;
 
-            double remaining = budgetService.getRemaining(b, spent);
+            double remaining =
+                    budgetService.getRemaining(
+                            b,
+                            spent
+                    );
 
-            String status = budgetService.getStatus(b.getLimitAmount(), spent);
+            String status =
+                    budgetService.getStatus(
+                            b.getLimitAmount(),
+                            spent
+                    );
 
             tableModel.addRow(new Object[]{
                     b.getCategory(),

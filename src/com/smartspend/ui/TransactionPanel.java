@@ -73,7 +73,40 @@ public class TransactionPanel extends JPanel {
         formPanel.add(addButton);
         formPanel.add(clearButton);
 
-        add(formPanel, BorderLayout.NORTH);
+        JLabel titleLabel = new JLabel(
+                "Transaction Management",
+                SwingConstants.CENTER
+        );
+
+        titleLabel.setFont(
+                new Font(
+                        "Arial",
+                        Font.BOLD,
+                        24
+                )
+        );
+
+        JPanel topPanel = new JPanel(
+                new BorderLayout()
+        );
+
+        topPanel.add(
+                titleLabel,
+                BorderLayout.NORTH
+        );
+
+        topPanel.add(
+                formPanel,
+                BorderLayout.CENTER
+        );
+        titleLabel.setBorder(
+                BorderFactory.createEmptyBorder(10, 0, 30, 0)
+        );
+
+        add(
+                topPanel,
+                BorderLayout.NORTH
+        );
 
         // ================= TABLE =================
         tableModel = new DefaultTableModel(
